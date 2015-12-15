@@ -1,0 +1,9 @@
+[uwsgi]
+die-on-term = true
+master = true
+plugins = python
+processes = 8
+wsgi-file = fake_exporter.py
+{% for port in range(3000, 3200) -%}
+http-socket = 0.0.0.0:{{ port }}
+{% endfor %}

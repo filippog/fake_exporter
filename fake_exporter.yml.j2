@@ -1,0 +1,16 @@
+# sample prometheus "file SD" config file, define a number of targets for each
+# "group"
+
+- labels:
+    group: "group1"
+  targets:
+    {% for i in range(3000, 3100) -%}
+      - 'localhost:{{ i }}'
+    {% endfor %}
+
+- labels:
+    group: "group2"
+  targets:
+    {% for i in range(3100, 3200) -%}
+      - 'localhost:{{ i }}'
+    {% endfor %}
