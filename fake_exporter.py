@@ -127,7 +127,7 @@ def fake_metrics():
     """Yield fake prometheus metrics.
 
     Each metric will be repeated random(0, metric_repeat) times, each with
-    different tags (possibly none) up to random(0, max_tags) times.
+    different tags (possibly none) up to random(0, max_tags).
     """
 
     metric_repeat = int(request.args.get('metric_repeat', 5))
@@ -143,6 +143,7 @@ def fake_metrics():
     all_tags = ['key%d' % x for x in range(max_tags)]
 
     result = []
+    seen_metrics = {}
     while len(result) < metrics:
         m = random.choice(WORDS)
         tag_keys = all_tags[:random.randint(0, len(all_tags))]
@@ -151,6 +152,10 @@ def fake_metrics():
             m_name = "%s%s{%s}" % (prefix, m, ','.join(m_tags))
             if not m_tags:
                 m_name = "%s%s" % (prefix, m)
+
+            if m_name in seen_metrics:
+                break
+            seen_metrics[m_name] = 1
 
             if m_name not in METRIC_VALUES:
                 m_hash = sum([ord(x) for x in m_name])
@@ -164,9 +169,6 @@ def fake_metrics():
                 delta *= -1
             METRIC_VALUES[m_name] += delta
             result.append("%s %f" % (m_name, METRIC_VALUES[m_name]))
-            # do not repeat metrics with no tags
-            if not m_tags:
-                break
     return '\n'.join(result) + '\n'
 
 
